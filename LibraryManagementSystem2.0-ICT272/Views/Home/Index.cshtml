@@ -1,8 +1,489 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- HERO SECTION -->
+<div class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <div class="row align-items-center min-vh-hero">
+            <div class="col-lg-7">
+                <div class="hero-badge mb-3">
+                    <i class="bi bi-stars me-2"></i>
+                    Modern Library Management System
+                </div>
+                <h1 class="hero-title">
+                    Your Digital
+                    <span class="hero-highlight">Library</span>
+                    Experience
+                </h1>
+                <p class="hero-subtitle">
+                    Discover thousands of books, borrow online,
+                    track your reading journey, and connect with
+                    a community of readers — all in one place.
+                </p>
+                @if (!User.Identity!.IsAuthenticated)
+                {
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a asp-controller="Account"
+                           asp-action="Register"
+                           class="btn-hero-primary">
+                            <i class="bi bi-person-plus me-2"></i>
+                            Get Started Free
+                        </a>
+                        <a asp-controller="Account"
+                           asp-action="Login"
+                           class="btn-hero-outline">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Sign In
+                        </a>
+                    </div>
+                    <p class="hero-note mt-3">
+                        <i class="bi bi-shield-check me-1"></i>
+                        Free to join · No credit card required
+                    </p>
+                }
+                else
+                {
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a asp-controller="Books"
+                           asp-action="Index"
+                           class="btn-hero-primary">
+                            <i class="bi bi-search me-2"></i>
+                            Browse Books
+                        </a>
+                        @if (User.IsInRole("Member"))
+                        {
+                            <a asp-controller="Borrow"
+                               asp-action="MyBorrows"
+                               class="btn-hero-outline">
+                                <i class="bi bi-bookmark me-2"></i>
+                                My Borrows
+                            </a>
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-controller="Admin"
+                               asp-action="Dashboard"
+                               class="btn-hero-outline">
+                                <i class="bi bi-speedometer2 me-2"></i>
+                                Dashboard
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="hero-visual">
+                    <div class="floating-card fcard-1">
+                        <i class="bi bi-book-half"></i>
+                        <span>@ViewBag.TotalBooks Books</span>
+                    </div>
+                    <div class="floating-card fcard-2">
+                        <i class="bi bi-people"></i>
+                        <span>@ViewBag.TotalMembers Members</span>
+                    </div>
+                    <div class="floating-card fcard-3">
+                        <i class="bi bi-arrow-left-right"></i>
+                        <span>@ViewBag.ActiveBorrows Active</span>
+                    </div>
+                    <div class="hero-book-icon">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-wave">
+        <svg viewBox="0 0 1440 80"
+             preserveAspectRatio="none"
+             xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z"
+                  fill="#f0f4f8" />
+        </svg>
+    </div>
 </div>
+
+<!-- STATS SECTION -->
+<div class="stats-section">
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="pro-stat-card">
+                    <div class="pro-stat-icon"
+                         style="background:linear-gradient(135deg,
+                                #667eea,#764ba2)">
+                        <i class="bi bi-book"></i>
+                    </div>
+                    <div class="pro-stat-info">
+                        <h2 class="pro-stat-number">
+                            @ViewBag.TotalBooks
+                        </h2>
+                        <p class="pro-stat-label">Books Available</p>
+                        <span class="pro-stat-sub">
+                            In our collection
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="pro-stat-card">
+                    <div class="pro-stat-icon"
+                         style="background:linear-gradient(135deg,
+                                #11998e,#38ef7d)">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="pro-stat-info">
+                        <h2 class="pro-stat-number">
+                            @ViewBag.TotalMembers
+                        </h2>
+                        <p class="pro-stat-label">
+                            Registered Members
+                        </p>
+                        <span class="pro-stat-sub">
+                            Active community
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="pro-stat-card">
+                    <div class="pro-stat-icon"
+                         style="background:linear-gradient(135deg,
+                                #f093fb,#f5576c)">
+                        <i class="bi bi-arrow-left-right"></i>
+                    </div>
+                    <div class="pro-stat-info">
+                        <h2 class="pro-stat-number">
+                            @ViewBag.ActiveBorrows
+                        </h2>
+                        <p class="pro-stat-label">Active Borrows</p>
+                        <span class="pro-stat-sub">
+                            Currently borrowed
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FEATURES SECTION -->
+<div class="features-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">What We Offer</span>
+            <h2 class="section-title">
+                Everything You Need in One Place
+            </h2>
+            <p class="section-subtitle">
+                A complete digital library experience designed
+                for modern readers
+            </p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"
+                         style="background:rgba(102,126,234,0.1)">
+                        <i class="bi bi-search"
+                           style="color:#667eea"></i>
+                    </div>
+                    <h5 class="feature-title">Browse and Discover</h5>
+                    <p class="feature-desc">
+                        Search thousands of books by title, author
+                        or genre. Filter by category and find your
+                        next great read instantly.
+                    </p>
+                    <a asp-controller="Books" asp-action="Index"
+                       class="feature-link">
+                        Explore Books
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"
+                         style="background:rgba(17,153,142,0.1)">
+                        <i class="bi bi-bookmark-check"
+                           style="color:#11998e"></i>
+                    </div>
+                    <h5 class="feature-title">Borrow Online</h5>
+                    <p class="feature-desc">
+                        Borrow or reserve books with a single click.
+                        Track due dates, renew loans and manage
+                        your borrowing history easily.
+                    </p>
+                    <a asp-controller="Books" asp-action="Index"
+                       class="feature-link">
+                        Start Borrowing
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"
+                         style="background:rgba(245,87,108,0.1)">
+                        <i class="bi bi-star"
+                           style="color:#f5576c"></i>
+                    </div>
+                    <h5 class="feature-title">Rate and Review</h5>
+                    <p class="feature-desc">
+                        Share your reading experience with star
+                        ratings and reviews. Help other members
+                        discover their next favourite book.
+                    </p>
+                    <a asp-controller="Books" asp-action="Index"
+                       class="feature-link">
+                        See Reviews
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"
+                         style="background:rgba(79,172,254,0.1)">
+                        <i class="bi bi-clock-history"
+                           style="color:#4facfe"></i>
+                    </div>
+                    <h5 class="feature-title">Track History</h5>
+                    <p class="feature-desc">
+                        View your complete borrowing history,
+                        check due dates, monitor fines and keep
+                        track of every book you have read.
+                    </p>
+                    <a asp-controller="Account" asp-action="Login"
+                       class="feature-link">
+                        View History
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"
+                         style="background:rgba(67,233,123,0.1)">
+                        <i class="bi bi-tags"
+                           style="color:#43e97b"></i>
+                    </div>
+                    <h5 class="feature-title">Browse Categories</h5>
+                    <p class="feature-desc">
+                        Explore books organised by genre and
+                        category. From fiction to science, find
+                        exactly what interests you most.
+                    </p>
+                    <a asp-controller="Books" asp-action="Index"
+                       class="feature-link">
+                        Browse Genres
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"
+                         style="background:rgba(250,112,154,0.1)">
+                        <i class="bi bi-building"
+                           style="color:#fa709a"></i>
+                    </div>
+                    <h5 class="feature-title">Library Info</h5>
+                    <p class="feature-desc">
+                        Find our location, operating hours and
+                        contact details. Everything you need
+                        to visit or reach us easily.
+                    </p>
+                    <a asp-controller="LibraryProfile"
+                       asp-action="Index"
+                       class="feature-link">
+                        Learn More
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Simple Process</span>
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">
+                Get started in just three easy steps
+            </p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <div class="step-icon">
+                        <i class="bi bi-person-plus"></i>
+                    </div>
+                    <h5 class="step-title">Create Account</h5>
+                    <p class="step-desc">
+                        Register for free and get instant access
+                        to our entire book collection online.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <div class="step-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h5 class="step-title">Find Your Book</h5>
+                    <p class="step-desc">
+                        Search, filter and browse our catalogue
+                        to find the perfect book for you.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <div class="step-icon">
+                        <i class="bi bi-bookmark-check"></i>
+                    </div>
+                    <h5 class="step-title">Borrow and Enjoy</h5>
+                    <p class="step-desc">
+                        Borrow instantly online, track your
+                        due dates and renew with one click.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DEVELOPMENT TEAM TABLE -->
+<div class="team-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">ICT272 T1 2026</span>
+            <h2 class="section-title">Development Team</h2>
+            <p class="section-subtitle">
+                Web Design and Development — Group Assignment
+            </p>
+        </div>
+        <div class="team-table-wrap">
+            <table class="table team-table mb-0">
+                <thead>
+                    <tr>
+                        <th style="width:50px">#</th>
+                        <th>Student ID</th>
+                        <th>Full Name</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-bold text-muted">1</td>
+                        <td>
+                            <code class="student-id">20029869</code>
+                        </td>
+                        <td class="fw-semibold">Rakib Mahmud</td>
+                        <td>
+                            <span class="role-badge"
+                                  style="background:rgba(102,126,234,0.12);
+                                         color:#667eea">
+                                Lead Developer
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-muted">2</td>
+                        <td>
+                            <code class="student-id">20032100</code>
+                        </td>
+                        <td class="fw-semibold">Md Mehedi Hassan Talukder </td>
+                        <td>
+                            <span class="role-badge"
+                                  style="background:rgba(17,153,142,0.12);
+                                         color:#11998e">
+                                Backend Developer
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-muted">3</td>
+                        <td>
+                            <code class="student-id">20029800</code>
+                        </td>
+                        <td class="fw-semibold">Qazi Ibad</td>
+                        <td>
+                            <span class="role-badge"
+                                  style="background:rgba(79,172,254,0.12);
+                                         color:#4facfe">
+                                UI Designer
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-muted">4</td>
+                        <td>
+                            <code class="student-id">20030404</code>
+                        </td>
+                        <td class="fw-semibold">Md Salaman Prodhan</td>
+                        <td>
+                            <span class="role-badge"
+                                  style="background:rgba(192,38,211,0.12);
+                                         color:#c026d3">
+                                Database Designer
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-muted">5</td>
+                        <td>
+                            <code class="student-id">20031787</code>
+                        </td>
+                        <td class="fw-semibold">Md Tariqul Islam Rahad</td>
+                        <td>
+                            <span class="role-badge"
+                                  style="background:rgba(250,112,154,0.12);
+                                         color:#fa709a">
+                                Frontend Developer
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- CTA SECTION -->
+@if (!User.Identity!.IsAuthenticated)
+{
+    <div class="cta-section">
+        <div class="container text-center">
+            <h2 class="cta-title">Ready to Start Reading?</h2>
+            <p class="cta-subtitle">
+                Join thousands of members who are already
+                enjoying our digital library experience.
+            </p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a asp-controller="Account"
+                   asp-action="Register"
+                   class="btn-cta-primary">
+                    <i class="bi bi-person-plus me-2"></i>
+                    Create Free Account
+                </a>
+                <a asp-controller="Books"
+                   asp-action="Index"
+                   class="btn-cta-outline">
+                    <i class="bi bi-book me-2"></i>
+                    Browse Books First
+                </a>
+            </div>
+        </div>
+    </div>
+}

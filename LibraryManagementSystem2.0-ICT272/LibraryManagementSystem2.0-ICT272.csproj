@@ -4,7 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>LibraryManagementSystem2._0_ICT272</RootNamespace>
+    <RootNamespace>LibraryManagementSystem</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
