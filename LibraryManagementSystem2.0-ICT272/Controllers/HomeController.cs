@@ -1,20 +1,30 @@
-using System.Diagnostics;
-using LibraryManagementSystem2._0_ICT272.Models;
+using LibraryManagementSystem.Data;
+using LibraryManagementSystem.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-namespace LibraryManagementSystem2._0_ICT272.Controllers
+namespace LibraryManagementSystem.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ApplicationDbContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            ViewBag.TotalBooks = await _context.Books
+                .CountAsync(b => b.IsActive);
+            ViewBag.TotalMembers = await _context.Users
+                .CountAsync();
+            ViewBag.ActiveBorrows = await _context.BorrowRecords
+                .CountAsync(b =>
+                    b.Status == BorrowStatus.Borrowed ||
+                    b.Status == BorrowStatus.Renewed);
+
             return View();
         }
 
@@ -23,10 +33,12 @@ namespace LibraryManagementSystem2._0_ICT272.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [ResponseCache(Duration = 0,
+            Location = ResponseCacheLocation.None,
+            NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View();
         }
     }
 }
