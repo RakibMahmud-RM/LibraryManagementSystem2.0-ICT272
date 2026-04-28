@@ -1,0 +1,131 @@
+﻿@model LibraryManagementSystem.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "_Layout";
+}
+
+<div class="auth-wrapper">
+    <div class="auth-card auth-card-wide">
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i class="bi bi-person-plus"></i>
+            </div>
+            <h2>Create Account</h2>
+            <p>Join our library community today</p>
+        </div>
+        <div class="auth-body">
+            <form asp-action="Register" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All"
+                     class="alert alert-danger"></div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="FirstName"
+                               class="form-label fw-semibold">
+                        </label>
+                        <input asp-for="FirstName"
+                               class="form-control"
+                               placeholder="First name" />
+                        <span asp-validation-for="FirstName"
+                              class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="LastName"
+                               class="form-label fw-semibold">
+                        </label>
+                        <input asp-for="LastName"
+                               class="form-control"
+                               placeholder="Last name" />
+                        <span asp-validation-for="LastName"
+                              class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email"
+                           class="form-label fw-semibold"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-envelope"></i>
+                        </span>
+                        <input asp-for="Email"
+                               class="form-control"
+                               placeholder="your@email.com" />
+                    </div>
+                    <span asp-validation-for="Email"
+                          class="text-danger small"></span>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="PhoneNumber"
+                               class="form-label fw-semibold">
+                        </label>
+                        <input asp-for="PhoneNumber"
+                               class="form-control"
+                               placeholder="Phone number" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Address"
+                               class="form-label fw-semibold">
+                        </label>
+                        <input asp-for="Address"
+                               class="form-control"
+                               placeholder="Your address" />
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="Password"
+                               class="form-label fw-semibold">
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-lock"></i>
+                            </span>
+                            <input asp-for="Password"
+                                   class="form-control"
+                                   placeholder="Password" />
+                        </div>
+                        <span asp-validation-for="Password"
+                              class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="ConfirmPassword"
+                               class="form-label fw-semibold">
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-lock-fill"></i>
+                            </span>
+                            <input asp-for="ConfirmPassword"
+                                   class="form-control"
+                                   placeholder="Confirm password" />
+                        </div>
+                        <span asp-validation-for="ConfirmPassword"
+                              class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary w-100 py-2">
+                    <i class="bi bi-person-check me-2"></i>
+                    Create Account
+                </button>
+            </form>
+        </div>
+        <div class="auth-footer">
+            Already have an account?
+            <a asp-controller="Account"
+               asp-action="Login">
+                Sign in here
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

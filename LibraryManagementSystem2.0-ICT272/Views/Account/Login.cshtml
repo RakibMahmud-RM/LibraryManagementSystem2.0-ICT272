@@ -1,0 +1,80 @@
+﻿@model LibraryManagementSystem.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "_Layout";
+}
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i class="bi bi-book-half"></i>
+            </div>
+            <h2>Welcome Back</h2>
+            <p>Sign in to your library account</p>
+        </div>
+        <div class="auth-body">
+            <form asp-action="Login" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All"
+                     class="alert alert-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Email"
+                           class="form-label fw-semibold"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-envelope"></i>
+                        </span>
+                        <input asp-for="Email"
+                               class="form-control"
+                               placeholder="your@email.com" />
+                    </div>
+                    <span asp-validation-for="Email"
+                          class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Password"
+                           class="form-label fw-semibold"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-lock"></i>
+                        </span>
+                        <input asp-for="Password"
+                               class="form-control"
+                               placeholder="Enter password" />
+                    </div>
+                    <span asp-validation-for="Password"
+                          class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="RememberMe"
+                           class="form-check-input" />
+                    <label asp-for="RememberMe"
+                           class="form-check-label">
+                        Remember me
+                    </label>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary w-100 py-2">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                    Sign In
+                </button>
+            </form>
+        </div>
+        <div class="auth-footer">
+            Don't have an account?
+            <a asp-controller="Account"
+               asp-action="Register">
+                Register here
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
