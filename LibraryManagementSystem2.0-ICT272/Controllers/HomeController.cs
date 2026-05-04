@@ -14,16 +14,11 @@ namespace LibraryManagementSystem.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            ViewBag.TotalBooks = await _context.Books
-                .CountAsync(b => b.IsActive);
-            ViewBag.TotalMembers = await _context.Users
-                .CountAsync();
-            ViewBag.ActiveBorrows = await _context.BorrowRecords
-                .CountAsync(b =>
-                    b.Status == BorrowStatus.Borrowed ||
-                    b.Status == BorrowStatus.Renewed);
+            ViewBag.TotalBooks = 0;
+            ViewBag.TotalMembers = 0;
+            ViewBag.ActiveBorrows = 0;
 
             return View();
         }
