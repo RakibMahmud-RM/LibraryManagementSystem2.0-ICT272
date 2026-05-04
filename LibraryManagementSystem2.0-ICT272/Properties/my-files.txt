@@ -1,0 +1,1259 @@
+
+=== Views\Shared\_Layout.cshtml ===
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — LibraryMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+          rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/library-theme.css"
+          asp-append-version="true" />
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark
+            library-navbar sticky-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center gap-2"
+               asp-controller="Home" asp-action="Index">
+                <i class="bi bi-book-half fs-4"></i>
+                <span class="fw-bold">LibraryMS</span>
+            </a>
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           asp-controller="Home"
+                           asp-action="Index">
+                            <i class="bi bi-house me-1"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           asp-controller="Books"
+                           asp-action="Index">
+                            <i class="bi bi-book me-1"></i>
+                            Browse Books
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           asp-controller="LibraryProfile"
+                           asp-action="Index">
+                            <i class="bi bi-building me-1"></i>
+                            About Library
+                        </a>
+                    </li>
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               data-bs-toggle="dropdown">
+                                <i class="bi bi-gear me-1"></i>
+                                Admin
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="Admin"
+                                       asp-action="Dashboard">
+                                        <i class="bi bi-speedometer2 me-2"></i>
+                                        Dashboard
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="Admin"
+                                       asp-action="Members">
+                                        <i class="bi bi-people me-2"></i>
+                                        Manage Members
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="Books"
+                                       asp-action="Index">
+                                        <i class="bi bi-book me-2"></i>
+                                        Manage Books
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="Categories"
+                                       asp-action="Index">
+                                        <i class="bi bi-tags me-2"></i>
+                                        Manage Categories
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="LibraryProfile"
+                                       asp-action="Index">
+                                        <i class="bi bi-building me-2"></i>
+                                        Library Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="BorrowingRules"
+                                       asp-action="Index">
+                                        <i class="bi bi-sliders me-2"></i>
+                                        Borrowing Rules
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="Borrow"
+                                       asp-action="Index">
+                                        <i class="bi bi-arrow-left-right me-2"></i>
+                                        Borrow Transactions
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="Fines"
+                                       asp-action="Index">
+                                        <i class="bi bi-cash me-2"></i>
+                                        Manage Fines
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="Feedback"
+                                       asp-action="Manage">
+                                        <i class="bi bi-star me-2"></i>
+                                        Feedback and Ratings
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="Reports"
+                                       asp-action="Index">
+                                        <i class="bi bi-bar-chart me-2"></i>
+                                        Reports
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("Member"))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>
+                                My Library
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="Borrow"
+                                       asp-action="MyBorrows">
+                                        <i class="bi bi-bookmark me-2"></i>
+                                        My Borrows
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="Borrow"
+                                       asp-action="History">
+                                        <i class="bi bi-clock-history me-2"></i>
+                                        Borrow History
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="Fines"
+                                       asp-action="MyFines">
+                                        <i class="bi bi-cash-coin me-2"></i>
+                                        My Fines
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                </ul>
+
+                <ul class="navbar-nav ms-auto align-items-center gap-2">
+                    @if (User.Identity!.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <span class="navbar-text text-light
+                                         me-2 small">
+                                <i class="bi bi-person-circle me-1"></i>
+                                @User.Identity.Name
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <form asp-controller="Account"
+                                  asp-action="Logout"
+                                  method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit"
+                                        class="btn btn-outline-light
+                                               btn-sm navbar-auth-btn">
+                                    <i class="bi bi-box-arrow-right me-1"></i>
+                                    Logout
+                                </button>
+                            </form>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="btn btn-outline-light btn-sm
+                                      navbar-auth-btn me-1"
+                               asp-controller="Account"
+                               asp-action="Login">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>
+                                Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-warning btn-sm
+                                      navbar-auth-btn"
+                               asp-controller="Account"
+                               asp-action="Register">
+                                <i class="bi bi-person-plus me-1"></i>
+                                Register
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4 mt-3">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible
+                        fade show">
+                <i class="bi bi-check-circle me-2"></i>
+                @TempData["Success"]
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible
+                        fade show">
+                <i class="bi bi-exclamation-circle me-2"></i>
+                @TempData["Error"]
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert"></button>
+            </div>
+        }
+    </div>
+
+    <main class="pb-5">
+        @RenderBody()
+    </main>
+
+    <footer class="library-footer">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start
+                        mb-2 mb-md-0">
+                    <span class="fw-bold text-white">
+                        <i class="bi bi-book-half me-1"
+                           style="color:#e8a020"></i>
+                        LibraryMS
+                    </span>
+                    <span class="mx-2 opacity-30">|</span>
+                    <span>ICT272 Web Design and Development</span>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <span>
+                        &copy; @DateTime.Now.Year All rights reserved
+                    </span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+    @await RenderSectionAsync("Styles", required: false)
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>
+
+=== Views\Shared\Error.cshtml ===
+
+@model LibraryManagementSystem.Models.ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="container mt-5 text-center">
+    <div class="card mx-auto" style="max-width:500px">
+        <div class="card-body p-5">
+            <i class="bi bi-exclamation-triangle text-danger"
+               style="font-size:4rem"></i>
+            <h2 class="fw-bold mt-3">Something went wrong</h2>
+            <p class="text-muted">
+                An error occurred while processing your request.
+            </p>
+            @if (Model?.ShowRequestId ?? false)
+            {
+                <p>
+                    <strong>Request ID:</strong>
+                    <code>@Model?.RequestId</code>
+                </p>
+            }
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="btn btn-primary mt-2">
+                <i class="bi bi-house me-1"></i>
+                Go to Homepage
+            </a>
+        </div>
+    </div>
+</div>
+
+=== Views\_ViewImports.cshtml ===
+
+@using LibraryManagementSystem
+@using LibraryManagementSystem.Models
+@using LibraryManagementSystem.ViewModels
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+=== Views\Account\Login.cshtml ===
+
+@model LibraryManagementSystem.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "_Layout";
+}
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i class="bi bi-book-half"></i>
+            </div>
+            <h2>Welcome Back</h2>
+            <p>Sign in to your library account</p>
+        </div>
+        <div class="auth-body">
+            <form asp-action="Login" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All"
+                     class="alert alert-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Email"
+                           class="form-label fw-semibold"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-envelope"></i>
+                        </span>
+                        <input asp-for="Email"
+                               class="form-control"
+                               placeholder="your@email.com" />
+                    </div>
+                    <span asp-validation-for="Email"
+                          class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Password"
+                           class="form-label fw-semibold"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-lock"></i>
+                        </span>
+                        <input asp-for="Password"
+                               class="form-control"
+                               placeholder="Enter password" />
+                    </div>
+                    <span asp-validation-for="Password"
+                          class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="RememberMe"
+                           class="form-check-input" />
+                    <label asp-for="RememberMe"
+                           class="form-check-label">
+                        Remember me
+                    </label>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary w-100 py-2">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                    Sign In
+                </button>
+            </form>
+        </div>
+        <div class="auth-footer">
+            Don't have an account?
+            <a asp-controller="Account"
+               asp-action="Register">
+                Register here
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
+
+=== Views\Account\Register.cshtml ===
+
+@model LibraryManagementSystem.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "_Layout";
+}
+
+<div class="auth-wrapper">
+    <div class="auth-card auth-card-wide">
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i class="bi bi-person-plus"></i>
+            </div>
+            <h2>Create Account</h2>
+            <p>Join our library community today</p>
+        </div>
+        <div class="auth-body">
+            <form asp-action="Register" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All"
+                     class="alert alert-danger"></div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="FirstName"
+                               class="form-label fw-semibold">
+                        </label>
+                        <input asp-for="FirstName"
+                               class="form-control"
+                               placeholder="First name" />
+                        <span asp-validation-for="FirstName"
+                              class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="LastName"
+                               class="form-label fw-semibold">
+                        </label>
+                        <input asp-for="LastName"
+                               class="form-control"
+                               placeholder="Last name" />
+                        <span asp-validation-for="LastName"
+                              class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email"
+                           class="form-label fw-semibold"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-envelope"></i>
+                        </span>
+                        <input asp-for="Email"
+                               class="form-control"
+                               placeholder="your@email.com" />
+                    </div>
+                    <span asp-validation-for="Email"
+                          class="text-danger small"></span>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="PhoneNumber"
+                               class="form-label fw-semibold">
+                        </label>
+                        <input asp-for="PhoneNumber"
+                               class="form-control"
+                               placeholder="Phone number" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Address"
+                               class="form-label fw-semibold">
+                        </label>
+                        <input asp-for="Address"
+                               class="form-control"
+                               placeholder="Your address" />
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="Password"
+                               class="form-label fw-semibold">
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-lock"></i>
+                            </span>
+                            <input asp-for="Password"
+                                   class="form-control"
+                                   placeholder="Password" />
+                        </div>
+                        <span asp-validation-for="Password"
+                              class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="ConfirmPassword"
+                               class="form-label fw-semibold">
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-lock-fill"></i>
+                            </span>
+                            <input asp-for="ConfirmPassword"
+                                   class="form-control"
+                                   placeholder="Confirm password" />
+                        </div>
+                        <span asp-validation-for="ConfirmPassword"
+                              class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary w-100 py-2">
+                    <i class="bi bi-person-check me-2"></i>
+                    Create Account
+                </button>
+            </form>
+        </div>
+        <div class="auth-footer">
+            Already have an account?
+            <a asp-controller="Account"
+               asp-action="Login">
+                Sign in here
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
+
+=== Views\Account\AccessDenied.cshtml ===
+
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="container mt-5 text-center">
+    <div class="card mx-auto" style="max-width:500px">
+        <div class="card-body p-5">
+            <i class="bi bi-shield-x text-danger"
+               style="font-size:4rem"></i>
+            <h2 class="fw-bold mt-3">Access Denied</h2>
+            <p class="text-muted">
+                You do not have permission to view this page.
+            </p>
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="btn btn-primary mt-2">
+                <i class="bi bi-house me-1"></i>
+                Go to Homepage
+            </a>
+        </div>
+    </div>
+</div>
+
+=== Views\Home\Index.cshtml ===
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+<!-- HERO SECTION -->
+<div class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <div class="row align-items-center min-vh-hero">
+            <div class="col-lg-7">
+                <div class="hero-badge mb-3">
+                    <i class="bi bi-stars me-2"></i>
+                    Modern Library Management System
+                </div>
+                <h1 class="hero-title">
+                    Your Digital
+                    <span class="hero-highlight">Library</span>
+                    Experience
+                </h1>
+                <p class="hero-subtitle">
+                    Discover thousands of books, borrow online,
+                    track your reading journey, and connect with
+                    a community of readers — all in one place.
+                </p>
+                @if (!User.Identity!.IsAuthenticated)
+                {
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a asp-controller="Account"
+                           asp-action="Register"
+                           class="btn-hero-primary">
+                            <i class="bi bi-person-plus me-2"></i>
+                            Get Started Free
+                        </a>
+                        <a asp-controller="Account"
+                           asp-action="Login"
+                           class="btn-hero-outline">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Sign In
+                        </a>
+                    </div>
+                    <p class="hero-note mt-3">
+                        <i class="bi bi-shield-check me-1"></i>
+                        Free to join · No credit card required
+                    </p>
+                }
+                else
+                {
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a asp-controller="Books"
+                           asp-action="Index"
+                           class="btn-hero-primary">
+                            <i class="bi bi-search me-2"></i>
+                            Browse Books
+                        </a>
+                        @if (User.IsInRole("Member"))
+                        {
+                            <a asp-controller="Borrow"
+                               asp-action="MyBorrows"
+                               class="btn-hero-outline">
+                                <i class="bi bi-bookmark me-2"></i>
+                                My Borrows
+                            </a>
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-controller="Admin"
+                               asp-action="Dashboard"
+                               class="btn-hero-outline">
+                                <i class="bi bi-speedometer2 me-2"></i>
+                                Dashboard
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="hero-visual">
+                    <div class="floating-card fcard-1">
+                        <i class="bi bi-book-half"></i>
+                        <span>@ViewBag.TotalBooks Books</span>
+                    </div>
+                    <div class="floating-card fcard-2">
+                        <i class="bi bi-people"></i>
+                        <span>@ViewBag.TotalMembers Members</span>
+                    </div>
+                    <div class="floating-card fcard-3">
+                        <i class="bi bi-arrow-left-right"></i>
+                        <span>@ViewBag.ActiveBorrows Active</span>
+                    </div>
+                    <div class="hero-book-icon">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-wave">
+        <svg viewBox="0 0 1440 80"
+             preserveAspectRatio="none"
+             xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z"
+                  fill="#f0f4f8" />
+        </svg>
+    </div>
+</div>
+
+<!-- STATS SECTION -->
+<div class="stats-section">
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="pro-stat-card">
+                    <div class="pro-stat-icon"
+                         style="background:linear-gradient(135deg,
+                                #667eea,#764ba2)">
+                        <i class="bi bi-book"></i>
+                    </div>
+                    <div class="pro-stat-info">
+                        <h2 class="pro-stat-number">
+                            @ViewBag.TotalBooks
+                        </h2>
+                        <p class="pro-stat-label">Books Available</p>
+                        <span class="pro-stat-sub">
+                            In our collection
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="pro-stat-card">
+                    <div class="pro-stat-icon"
+                         style="background:linear-gradient(135deg,
+                                #11998e,#38ef7d)">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="pro-stat-info">
+                        <h2 class="pro-stat-number">
+                            @ViewBag.TotalMembers
+                        </h2>
+                        <p class="pro-stat-label">
+                            Registered Members
+                        </p>
+                        <span class="pro-stat-sub">
+                            Active community
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="pro-stat-card">
+                    <div class="pro-stat-icon"
+                         style="background:linear-gradient(135deg,
+                                #f093fb,#f5576c)">
+                        <i class="bi bi-arrow-left-right"></i>
+                    </div>
+                    <div class="pro-stat-info">
+                        <h2 class="pro-stat-number">
+                            @ViewBag.ActiveBorrows
+                        </h2>
+                        <p class="pro-stat-label">Active Borrows</p>
+                        <span class="pro-stat-sub">
+                            Currently borrowed
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FEATURES SECTION -->
+<div class="features-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">What We Offer</span>
+            <h2 class="section-title">
+                Everything You Need in One Place
+            </h2>
+            <p class="section-subtitle">
+                A complete digital library experience designed
+                for modern readers
+            </p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"
+                         style="background:rgba(102,126,234,0.1)">
+                        <i class="bi bi-search"
+                           style="color:#667eea"></i>
+                    </div>
+                    <h5 class="feature-title">Browse and Discover</h5>
+                    <p class="feature-desc">
+                        Search thousands of books by title, author
+                        or genre. Filter by category and find your
+                        next great read instantly.
+                    </p>
+                    <a asp-controller="Books" asp-action="Index"
+                       class="feature-link">
+                        Explore Books
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"
+                         style="background:rgba(17,153,142,0.1)">
+                        <i class="bi bi-bookmark-check"
+                           style="color:#11998e"></i>
+                    </div>
+                    <h5 class="feature-title">Borrow Online</h5>
+                    <p class="feature-desc">
+                        Borrow or reserve books with a single click.
+                        Track due dates, renew loans and manage
+                        your borrowing history easily.
+                    </p>
+                    <a asp-controller="Books" asp-action="Index"
+                       class="feature-link">
+                        Start Borrowing
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"
+                         style="background:rgba(245,87,108,0.1)">
+                        <i class="bi bi-star"
+                           style="color:#f5576c"></i>
+                    </div>
+                    <h5 class="feature-title">Rate and Review</h5>
+                    <p class="feature-desc">
+                        Share your reading experience with star
+                        ratings and reviews. Help other members
+                        discover their next favourite book.
+                    </p>
+                    <a asp-controller="Books" asp-action="Index"
+                       class="feature-link">
+                        See Reviews
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"
+                         style="background:rgba(79,172,254,0.1)">
+                        <i class="bi bi-clock-history"
+                           style="color:#4facfe"></i>
+                    </div>
+                    <h5 class="feature-title">Track History</h5>
+                    <p class="feature-desc">
+                        View your complete borrowing history,
+                        check due dates, monitor fines and keep
+                        track of every book you have read.
+                    </p>
+                    <a asp-controller="Account" asp-action="Login"
+                       class="feature-link">
+                        View History
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"
+                         style="background:rgba(67,233,123,0.1)">
+                        <i class="bi bi-tags"
+                           style="color:#43e97b"></i>
+                    </div>
+                    <h5 class="feature-title">Browse Categories</h5>
+                    <p class="feature-desc">
+                        Explore books organised by genre and
+                        category. From fiction to science, find
+                        exactly what interests you most.
+                    </p>
+                    <a asp-controller="Books" asp-action="Index"
+                       class="feature-link">
+                        Browse Genres
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"
+                         style="background:rgba(250,112,154,0.1)">
+                        <i class="bi bi-building"
+                           style="color:#fa709a"></i>
+                    </div>
+                    <h5 class="feature-title">Library Info</h5>
+                    <p class="feature-desc">
+                        Find our location, operating hours and
+                        contact details. Everything you need
+                        to visit or reach us easily.
+                    </p>
+                    <a asp-controller="LibraryProfile"
+                       asp-action="Index"
+                       class="feature-link">
+                        Learn More
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Simple Process</span>
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">
+                Get started in just three easy steps
+            </p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <div class="step-icon">
+                        <i class="bi bi-person-plus"></i>
+                    </div>
+                    <h5 class="step-title">Create Account</h5>
+                    <p class="step-desc">
+                        Register for free and get instant access
+                        to our entire book collection online.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <div class="step-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h5 class="step-title">Find Your Book</h5>
+                    <p class="step-desc">
+                        Search, filter and browse our catalogue
+                        to find the perfect book for you.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <div class="step-icon">
+                        <i class="bi bi-bookmark-check"></i>
+                    </div>
+                    <h5 class="step-title">Borrow and Enjoy</h5>
+                    <p class="step-desc">
+                        Borrow instantly online, track your
+                        due dates and renew with one click.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DEVELOPMENT TEAM TABLE -->
+<div class="team-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">ICT272 T1 2026</span>
+            <h2 class="section-title">Development Team</h2>
+            <p class="section-subtitle">
+                Web Design and Development — Group Assignment
+            </p>
+        </div>
+        <div class="team-table-wrap">
+            <table class="table team-table mb-0">
+                <thead>
+                    <tr>
+                        <th style="width:50px">#</th>
+                        <th>Student ID</th>
+                        <th>Full Name</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-bold text-muted">1</td>
+                        <td>
+                            <code class="student-id">20029869</code>
+                        </td>
+                        <td class="fw-semibold">Rakib Mahmud</td>
+                        <td>
+                            <span class="role-badge"
+                                  style="background:rgba(102,126,234,0.12);
+                                         color:#667eea">
+                                Lead Developer
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-muted">2</td>
+                        <td>
+                            <code class="student-id">20032100</code>
+                        </td>
+                        <td class="fw-semibold">Md Mehedi Hassan Talukder </td>
+                        <td>
+                            <span class="role-badge"
+                                  style="background:rgba(17,153,142,0.12);
+                                         color:#11998e">
+                                Backend Developer
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-muted">3</td>
+                        <td>
+                            <code class="student-id">20029800</code>
+                        </td>
+                        <td class="fw-semibold">Qazi Ibad</td>
+                        <td>
+                            <span class="role-badge"
+                                  style="background:rgba(79,172,254,0.12);
+                                         color:#4facfe">
+                                UI Designer
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-muted">4</td>
+                        <td>
+                            <code class="student-id">20030404</code>
+                        </td>
+                        <td class="fw-semibold">Md Salaman Prodhan</td>
+                        <td>
+                            <span class="role-badge"
+                                  style="background:rgba(192,38,211,0.12);
+                                         color:#c026d3">
+                                Database Designer
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-muted">5</td>
+                        <td>
+                            <code class="student-id">20031787</code>
+                        </td>
+                        <td class="fw-semibold">Md Tariqul Islam Rahad</td>
+                        <td>
+                            <span class="role-badge"
+                                  style="background:rgba(250,112,154,0.12);
+                                         color:#fa709a">
+                                Frontend Developer
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- CTA SECTION -->
+@if (!User.Identity!.IsAuthenticated)
+{
+    <div class="cta-section">
+        <div class="container text-center">
+            <h2 class="cta-title">Ready to Start Reading?</h2>
+            <p class="cta-subtitle">
+                Join thousands of members who are already
+                enjoying our digital library experience.
+            </p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a asp-controller="Account"
+                   asp-action="Register"
+                   class="btn-cta-primary">
+                    <i class="bi bi-person-plus me-2"></i>
+                    Create Free Account
+                </a>
+                <a asp-controller="Books"
+                   asp-action="Index"
+                   class="btn-cta-outline">
+                    <i class="bi bi-book me-2"></i>
+                    Browse Books First
+                </a>
+            </div>
+        </div>
+    </div>
+}
+
+=== Controllers\HomeController.cs ===
+
+using LibraryManagementSystem.Data;
+using LibraryManagementSystem.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace LibraryManagementSystem.Controllers
+{
+    public class HomeController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+
+        public HomeController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public IActionResult Index()
+        {
+            ViewBag.TotalBooks = 0;
+            ViewBag.TotalMembers = 0;
+            ViewBag.ActiveBorrows = 0;
+
+            return View();
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0,
+            Location = ResponseCacheLocation.None,
+            NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel
+            {
+                RequestId = System.Diagnostics.Activity
+                    .Current?.Id ??
+                    HttpContext.TraceIdentifier
+            });
+        }
+    }
+}
+
+=== Models\Reservation.cs ===
+
+using System.ComponentModel.DataAnnotations;
+
+namespace LibraryManagementSystem.Models
+{
+    public enum ReservationStatus
+    {
+        Pending,
+        Fulfilled,
+        Cancelled,
+        Expired
+    }
+
+    public class Reservation
+    {
+        public int Id { get; set; }
+
+        [Required]
+        public string UserId { get; set; } = string.Empty;
+        public ApplicationUser User { get; set; } = null!;
+
+        [Required]
+        public int BookId { get; set; }
+        public Book Book { get; set; } = null!;
+
+        [Display(Name = "Reservation Date")]
+        public DateTime ReservationDate { get; set; }
+            = DateTime.Now;
+
+        public ReservationStatus Status { get; set; }
+            = ReservationStatus.Pending;
+    }
+}
+
+=== Models\ErrorViewModel.cs ===
+
+namespace LibraryManagementSystem.Models
+{
+    public class ErrorViewModel
+    {
+        public string? RequestId { get; set; }
+
+        public bool ShowRequestId =>
+            !string.IsNullOrEmpty(RequestId);
+    }
+}
+
+=== ViewModels\BookViewModel.cs ===
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
+
+namespace LibraryManagementSystem.ViewModels
+{
+    public class BookViewModel
+    {
+        public int Id { get; set; }
+
+        [Required]
+        [Display(Name = "Book Title")]
+        public string Title { get; set; } = string.Empty;
+
+        [Required]
+        public string Author { get; set; } = string.Empty;
+
+        [Display(Name = "ISBN")]
+        public string ISBN { get; set; } = string.Empty;
+
+        public string? Description { get; set; }
+
+        [Display(Name = "Published Year")]
+        public int PublishedYear { get; set; }
+
+        public string? Publisher { get; set; }
+
+        [Required]
+        [Range(1, 1000)]
+        [Display(Name = "Total Copies")]
+        public int TotalCopies { get; set; }
+
+        [Display(Name = "Active")]
+        public bool IsActive { get; set; } = true;
+
+        [Display(Name = "Cover Image")]
+        public IFormFile? CoverImage { get; set; }
+
+        public string? ExistingCoverImagePath { get; set; }
+
+        public List<int> SelectedCategoryIds { get; set; }
+            = new List<int>();
+
+        public List<SelectListItem> AvailableCategories { get; set; }
+            = new List<SelectListItem>();
+    }
+}
+
+=== ViewModels\RegisterViewModel.cs ===
+
+using System.ComponentModel.DataAnnotations;
+
+namespace LibraryManagementSystem.ViewModels
+{
+    public class RegisterViewModel
+    {
+        [Required]
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; } = string.Empty;
+
+        [Required]
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; } = string.Empty;
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Phone]
+        [Display(Name = "Phone Number")]
+        public string? PhoneNumber { get; set; }
+
+        [StringLength(200)]
+        public string? Address { get; set; }
+
+        [Required]
+        [DataType(DataType.Password)]
+        [StringLength(100, MinimumLength = 6)]
+        public string Password { get; set; } = string.Empty;
+
+        [Required]
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm Password")]
+        [Compare("Password")]
+        public string ConfirmPassword { get; set; } = string.Empty;
+    }
+}
