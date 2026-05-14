@@ -4,13 +4,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagementSystem.Data
 {
-    public class ApplicationDbContext
-        : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(
-            DbContextOptions<ApplicationDbContext> options)
-            : base(options) { }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options)
+        {
+        }
 
+        // DbSets — each one becomes a table in the database
         public DbSet<Book> Books { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<BookCategory> BookCategories { get; set; }
@@ -21,11 +22,11 @@ namespace LibraryManagementSystem.Data
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<LibraryProfile> LibraryProfiles { get; set; }
 
-        protected override void OnModelCreating(
-            ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            // Many-to-many: Books ↔ Categories (composite primary key)
             modelBuilder.Entity<BookCategory>()
                 .HasKey(bc => new { bc.BookId, bc.CategoryId });
 
@@ -39,11 +40,13 @@ namespace LibraryManagementSystem.Data
                 .WithMany(c => c.BookCategories)
                 .HasForeignKey(bc => bc.CategoryId);
 
+            // Fine → BorrowRecord (one-to-one)
             modelBuilder.Entity<Fine>()
                 .HasOne(f => f.BorrowRecord)
                 .WithOne(b => b.Fine)
                 .HasForeignKey<Fine>(f => f.BorrowRecordId);
 
+            // Decimal precision for Fine amount
             modelBuilder.Entity<Fine>()
                 .Property(f => f.Amount)
                 .HasColumnType("decimal(18,2)");

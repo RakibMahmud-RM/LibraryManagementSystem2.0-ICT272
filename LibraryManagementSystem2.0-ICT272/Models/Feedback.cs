@@ -8,20 +8,27 @@ namespace LibraryManagementSystem.Models
 
         [Required]
         public string UserId { get; set; } = string.Empty;
-        public ApplicationUser User { get; set; } = null!;
 
         [Required]
         public int BookId { get; set; }
-        public Book Book { get; set; } = null!;
 
+        [Required]
         [Range(1, 5)]
+        [Display(Name = "Rating (1-5)")]
         public int Rating { get; set; }
 
         [StringLength(1000)]
+        [Display(Name = "Your Review")]
         public string? Comment { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        [Display(Name = "Submitted On")]
+        public DateTime SubmittedDate { get; set; } = DateTime.Now;
 
+        [Display(Name = "Is Approved")]
         public bool IsApproved { get; set; } = false;
+
+        // Navigation properties
+        public ApplicationUser User { get; set; } = null!;
+        public Book Book { get; set; } = null!;
     }
 }

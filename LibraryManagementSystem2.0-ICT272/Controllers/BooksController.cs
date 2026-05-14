@@ -1,341 +1,331 @@
 ﻿using LibraryManagementSystem.Data;
 using LibraryManagementSystem.Models;
+using LibraryManagementSystem.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagementSystem.Controllers
 {
-    [Authorize]
-    public class BorrowController : Controller
+    public class BooksController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public BorrowController(
+        public BooksController(
             ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager)
+            IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
-            _userManager = userManager;
+            _webHostEnvironment = webHostEnvironment;
         }
 
-        // GET: /Borrow/Index — Admin only
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Index()
+        // GET: /Books/Index — Browse all books (Public)
+        public async Task<IActionResult> Index(string? search,
+            int? categoryId)
         {
-            var borrows = await _context.BorrowRecords
-                .Include(b => b.Book)
-                .Include(b => b.User)
-                .Include(b => b.Fine)
-                .OrderByDescending(b => b.BorrowDate)
+            var query = _context.Books
+                .Include(b => b.BookCategories)
+                    .ThenInclude(bc => bc.Category)
+                .Where(b => b.IsActive)
+                .AsQueryable();
+
+            // Search filter
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(b =>
+                    b.Title.Contains(search) ||
+                    b.Author.Contains(search) ||
+                    b.ISBN.Contains(search));
+            }
+
+            // Category filter
+            if (categoryId.HasValue)
+            {
+                query = query.Where(b =>
+                    b.BookCategories.Any(bc =>
+                        bc.CategoryId == categoryId));
+            }
+
+            var books = await query
+                .OrderByDescending(b => b.DateAdded)
                 .ToListAsync();
 
-            return View(borrows);
+            // For category filter dropdown
+            ViewBag.Categories = await _context.Categories
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                }).ToListAsync();
+
+            ViewBag.Search = search;
+            ViewBag.CategoryId = categoryId;
+
+            return View(books);
         }
 
-        // POST: /Borrow/BorrowBook
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Member")]
-        public async Task<IActionResult> BorrowBook(int bookId)
+        // GET: /Books/Details/5 — View book details (Public)
+        public async Task<IActionResult> Details(int id)
         {
-            var user = await _userManager
-                .GetUserAsync(User);
-            if (user == null)
-                return RedirectToAction("Login", "Account");
-
             var book = await _context.Books
-                .FirstOrDefaultAsync(b => b.Id == bookId);
+                .Include(b => b.BookCategories)
+                    .ThenInclude(bc => bc.Category)
+                .Include(b => b.Feedbacks)
+                    .ThenInclude(f => f.User)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
             if (book == null)
                 return NotFound();
 
-            if (book.AvailableCopies <= 0)
+            return View(book);
+        }
+
+        // GET: /Books/Create — Admin only
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create()
+        {
+            var viewModel = new BookViewModel
             {
-                TempData["Error"] =
-                    "This book is not available.";
-                return RedirectToAction(
-                    "Details", "Books",
-                    new { id = bookId });
-            }
-
-            var rule = await _context.BorrowingRules
-                .FirstOrDefaultAsync(r => r.IsActive);
-
-            int maxItems = rule?.MaxBorrowableItems ?? 5;
-            int currentBorrows = await _context.BorrowRecords
-                .CountAsync(b =>
-                    b.UserId == user.Id &&
-                    (b.Status == BorrowStatus.Borrowed ||
-                     b.Status == BorrowStatus.Renewed));
-
-            if (currentBorrows >= maxItems)
-            {
-                TempData["Error"] =
-                    $"You have reached the maximum " +
-                    $"borrowing limit of {maxItems} books.";
-                return RedirectToAction(
-                    "Details", "Books",
-                    new { id = bookId });
-            }
-
-            bool alreadyBorrowed = await _context.BorrowRecords
-                .AnyAsync(b =>
-                    b.UserId == user.Id &&
-                    b.BookId == bookId &&
-                    (b.Status == BorrowStatus.Borrowed ||
-                     b.Status == BorrowStatus.Renewed));
-
-            if (alreadyBorrowed)
-            {
-                TempData["Error"] =
-                    "You already have this book borrowed.";
-                return RedirectToAction(
-                    "Details", "Books",
-                    new { id = bookId });
-            }
-
-            int loanDays = rule?.LoanDurationDays ?? 14;
-
-            var borrowRecord = new BorrowRecord
-            {
-                UserId = user.Id,
-                BookId = bookId,
-                BorrowDate = DateTime.Now,
-                DueDate = DateTime.Now.AddDays(loanDays),
-                Status = BorrowStatus.Borrowed
+                AvailableCategories = await GetCategoryListAsync()
             };
-
-            book.AvailableCopies--;
-            _context.BorrowRecords.Add(borrowRecord);
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] =
-                $"You have borrowed '{book.Title}'. " +
-                $"Due date: {borrowRecord.DueDate:MMM dd, yyyy}";
-
-            return RedirectToAction(nameof(MyBorrows));
+            return View(viewModel);
         }
 
-        // GET: /Borrow/MyBorrows
-        [Authorize(Roles = "Member")]
-        public async Task<IActionResult> MyBorrows()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return RedirectToAction("Login", "Account");
-
-            // Auto-mark overdue
-            var overdueRecords = await _context.BorrowRecords
-                .Where(b =>
-                    b.UserId == user.Id &&
-                    b.DueDate < DateTime.Now &&
-                    (b.Status == BorrowStatus.Borrowed ||
-                     b.Status == BorrowStatus.Renewed))
-                .ToListAsync();
-
-            foreach (var record in overdueRecords)
-                record.Status = BorrowStatus.Overdue;
-
-            if (overdueRecords.Any())
-                await _context.SaveChangesAsync();
-
-            var borrows = await _context.BorrowRecords
-                .Include(b => b.Book)
-                .Include(b => b.Fine)
-                .Where(b =>
-                    b.UserId == user.Id &&
-                    b.Status != BorrowStatus.Returned)
-                .OrderBy(b => b.DueDate)
-                .ToListAsync();
-
-            return View(borrows);
-        }
-
-        // POST: /Borrow/Renew
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Member")]
-        public async Task<IActionResult> Renew(int borrowId)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return RedirectToAction("Login", "Account");
-
-            var borrow = await _context.BorrowRecords
-                .Include(b => b.Book)
-                .FirstOrDefaultAsync(b =>
-                    b.Id == borrowId &&
-                    b.UserId == user.Id);
-
-            if (borrow == null)
-                return NotFound();
-
-            var rule = await _context.BorrowingRules
-                .FirstOrDefaultAsync(r => r.IsActive);
-            int maxRenewals = rule?.MaxRenewals ?? 2;
-
-            if (borrow.RenewalCount >= maxRenewals)
-            {
-                TempData["Error"] =
-                    $"Maximum renewals ({maxRenewals}) " +
-                    $"reached for this book.";
-                return RedirectToAction(nameof(MyBorrows));
-            }
-
-            int loanDays = rule?.LoanDurationDays ?? 14;
-            borrow.DueDate = DateTime.Now.AddDays(loanDays);
-            borrow.RenewalCount++;
-            borrow.Status = BorrowStatus.Renewed;
-
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] =
-                $"'{borrow.Book.Title}' renewed. " +
-                $"New due date: {borrow.DueDate:MMM dd, yyyy}";
-
-            return RedirectToAction(nameof(MyBorrows));
-        }
-
-        // POST: /Borrow/Return — Admin only
+        // POST: /Books/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Return(int borrowId)
+        public async Task<IActionResult> Create(BookViewModel model)
         {
-            var borrow = await _context.BorrowRecords
-                .Include(b => b.Book)
-                .FirstOrDefaultAsync(b => b.Id == borrowId);
-
-            if (borrow == null)
-                return NotFound();
-
-            borrow.ReturnDate = DateTime.Now;
-            borrow.Status = BorrowStatus.Returned;
-            borrow.Book.AvailableCopies++;
-
-            // Calculate fine if overdue
-            if (DateTime.Now > borrow.DueDate)
+            if (!ModelState.IsValid)
             {
-                var rule = await _context.BorrowingRules
-                    .FirstOrDefaultAsync(r => r.IsActive);
-                decimal penaltyPerDay =
-                    rule?.OverduePenaltyPerDay ?? 0.50m;
-
-                int daysOverdue = (int)(DateTime.Now
-                    - borrow.DueDate).TotalDays;
-                decimal fineAmount =
-                    daysOverdue * penaltyPerDay;
-
-                var fine = new Fine
-                {
-                    BorrowRecordId = borrow.Id,
-                    Amount = fineAmount,
-                    Reason =
-                        $"Overdue by {daysOverdue} day(s)",
-                    IssuedDate = DateTime.Now,
-                    IsPaid = false
-                };
-
-                _context.Fines.Add(fine);
+                model.AvailableCategories = await GetCategoryListAsync();
+                return View(model);
             }
 
+            var book = new Book
+            {
+                Title = model.Title,
+                Author = model.Author,
+                ISBN = model.ISBN,
+                Description = model.Description,
+                PublishedYear = model.PublishedYear,
+                Publisher = model.Publisher,
+                TotalCopies = model.TotalCopies,
+                AvailableCopies = model.TotalCopies,
+                IsActive = model.IsActive,
+                DateAdded = DateTime.Now
+            };
+
+            // Handle image upload
+            if (model.CoverImage != null &&
+                model.CoverImage.Length > 0)
+            {
+                book.CoverImagePath = await SaveImageAsync(
+                    model.CoverImage);
+            }
+
+            _context.Books.Add(book);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] =
-                $"'{borrow.Book.Title}' returned successfully.";
+            // Save categories
+            if (model.SelectedCategoryIds.Any())
+            {
+                foreach (var catId in model.SelectedCategoryIds)
+                {
+                    _context.BookCategories.Add(new BookCategory
+                    {
+                        BookId = book.Id,
+                        CategoryId = catId
+                    });
+                }
+                await _context.SaveChangesAsync();
+            }
 
+            TempData["Success"] =
+                $"Book '{book.Title}' added successfully!";
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: /Borrow/History
-        [Authorize(Roles = "Member")]
-        public async Task<IActionResult> History()
+        // GET: /Books/Edit/5 — Admin only
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(int id)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return RedirectToAction("Login", "Account");
+            var book = await _context.Books
+                .Include(b => b.BookCategories)
+                .FirstOrDefaultAsync(b => b.Id == id);
 
-            var borrows = await _context.BorrowRecords
-                .Include(b => b.Book)
-                .Include(b => b.Fine)
-                .Where(b => b.UserId == user.Id)
-                .OrderByDescending(b => b.BorrowDate)
-                .ToListAsync();
-
-            return View(borrows);
-        }
-
-        // POST: /Borrow/Reserve
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Member")]
-        public async Task<IActionResult> Reserve(int bookId)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return RedirectToAction("Login", "Account");
-
-            bool alreadyReserved = await _context.Reservations
-                .AnyAsync(r =>
-                    r.UserId == user.Id &&
-                    r.BookId == bookId &&
-                    r.Status == ReservationStatus.Pending);
-
-            if (alreadyReserved)
-            {
-                TempData["Error"] =
-                    "You already have a reservation for this book.";
-                return RedirectToAction(
-                    "Details", "Books",
-                    new { id = bookId });
-            }
-
-            var reservation = new Reservation
-            {
-                UserId = user.Id,
-                BookId = bookId,
-                ReservationDate = DateTime.Now,
-                Status = ReservationStatus.Pending
-            };
-
-            _context.Reservations.Add(reservation);
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] =
-                "Book reserved successfully! " +
-                "We will notify you when it is available.";
-
-            return RedirectToAction(nameof(MyBorrows));
-        }
-
-        // POST: /Borrow/CancelReservation
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Member")]
-        public async Task<IActionResult> CancelReservation(
-            int reservationId)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return RedirectToAction("Login", "Account");
-
-            var reservation = await _context.Reservations
-                .FirstOrDefaultAsync(r =>
-                    r.Id == reservationId &&
-                    r.UserId == user.Id);
-
-            if (reservation == null)
+            if (book == null)
                 return NotFound();
 
-            reservation.Status = ReservationStatus.Cancelled;
+            var viewModel = new BookViewModel
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Author = book.Author,
+                ISBN = book.ISBN,
+                Description = book.Description,
+                PublishedYear = book.PublishedYear,
+                Publisher = book.Publisher,
+                TotalCopies = book.TotalCopies,
+                IsActive = book.IsActive,
+                ExistingCoverImagePath = book.CoverImagePath,
+                SelectedCategoryIds = book.BookCategories
+                    .Select(bc => bc.CategoryId).ToList(),
+                AvailableCategories = await GetCategoryListAsync()
+            };
+
+            return View(viewModel);
+        }
+
+        // POST: /Books/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(int id,
+            BookViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.AvailableCategories = await GetCategoryListAsync();
+                return View(model);
+            }
+
+            var book = await _context.Books
+                .Include(b => b.BookCategories)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (book == null)
+                return NotFound();
+
+            // Update fields
+            book.Title = model.Title;
+            book.Author = model.Author;
+            book.ISBN = model.ISBN;
+            book.Description = model.Description;
+            book.PublishedYear = model.PublishedYear;
+            book.Publisher = model.Publisher;
+            book.IsActive = model.IsActive;
+
+            // Update copies — adjust available if total changed
+            int diff = model.TotalCopies - book.TotalCopies;
+            book.TotalCopies = model.TotalCopies;
+            book.AvailableCopies = Math.Max(0,
+                book.AvailableCopies + diff);
+
+            // Handle new image upload
+            if (model.CoverImage != null &&
+                model.CoverImage.Length > 0)
+            {
+                // Delete old image
+                DeleteImage(book.CoverImagePath);
+                book.CoverImagePath = await SaveImageAsync(
+                    model.CoverImage);
+            }
+
+            // Update categories
+            _context.BookCategories.RemoveRange(book.BookCategories);
+            if (model.SelectedCategoryIds.Any())
+            {
+                foreach (var catId in model.SelectedCategoryIds)
+                {
+                    _context.BookCategories.Add(new BookCategory
+                    {
+                        BookId = book.Id,
+                        CategoryId = catId
+                    });
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
-                "Reservation cancelled successfully.";
+                $"Book '{book.Title}' updated successfully!";
+            return RedirectToAction(nameof(Index));
+        }
 
-            return RedirectToAction(nameof(MyBorrows));
+        // GET: /Books/Delete/5 — Admin only
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var book = await _context.Books
+                .Include(b => b.BookCategories)
+                    .ThenInclude(bc => bc.Category)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (book == null)
+                return NotFound();
+
+            return View(book);
+        }
+
+        // POST: /Books/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var book = await _context.Books
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (book == null)
+                return NotFound();
+
+            // Delete cover image file
+            DeleteImage(book.CoverImagePath);
+
+            _context.Books.Remove(book);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] =
+                $"Book '{book.Title}' deleted successfully!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // ── Private Helpers ───────────────────────────────────
+
+        private async Task<List<SelectListItem>> GetCategoryListAsync()
+        {
+            return await _context.Categories
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                }).ToListAsync();
+        }
+
+        private async Task<string> SaveImageAsync(IFormFile image)
+        {
+            string uploadsFolder = Path.Combine(
+                _webHostEnvironment.WebRootPath, "uploads", "covers");
+
+            Directory.CreateDirectory(uploadsFolder);
+
+            string uniqueFileName = Guid.NewGuid().ToString()
+                + "_" + image.FileName;
+
+            string filePath = Path.Combine(
+                uploadsFolder, uniqueFileName);
+
+            using var fileStream = new FileStream(
+                filePath, FileMode.Create);
+            await image.CopyToAsync(fileStream);
+
+            return "/uploads/covers/" + uniqueFileName;
+        }
+
+        private void DeleteImage(string? imagePath)
+        {
+            if (string.IsNullOrEmpty(imagePath)) return;
+
+            string fullPath = Path.Combine(
+                _webHostEnvironment.WebRootPath,
+                imagePath.TrimStart('/'));
+
+            if (System.IO.File.Exists(fullPath))
+                System.IO.File.Delete(fullPath);
         }
     }
 }
