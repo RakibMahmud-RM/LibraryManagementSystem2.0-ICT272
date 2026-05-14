@@ -1,0 +1,90 @@
+﻿@model IEnumerable<LibraryManagementSystem.Models.Fine>
+@{
+    ViewData["Title"] = "My Fines";
+    decimal totalUnpaid = Model.Where(f => !f.IsPaid).Sum(f => f.Amount);
+}
+
+<div class="container mt-4">
+    <div class="page-header mb-4">
+        <h2 class="fw-bold mb-0">
+            <i class="bi bi-cash-coin me-2"></i> My Fines
+        </h2>
+    </div>
+
+    @if (totalUnpaid > 0)
+    {
+        <div class="alert alert-danger d-flex align-items-center mb-4">
+            <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+            <div>
+                <strong>Outstanding: $@totalUnpaid.ToString("F2")</strong>
+                <br />
+                <small>Please visit the library to settle your fines.</small>
+            </div>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="card text-center py-5">
+            <div class="card-body">
+                <i class="bi bi-emoji-smile text-success"
+                   style="font-size:3rem"></i>
+                <h5 class="mt-3 text-success">No fines!</h5>
+                <p class="text-muted">You have a clean record. Keep it up!</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Amount</th>
+                            <th>Reason</th>
+                            <th>Issued On</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var fine in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>
+                                        @fine.BorrowRecord?.Book?.Title
+                                    </strong>
+                                </td>
+                                <td>
+                                    <strong class="@(fine.IsPaid ? "text-success" : "text-danger")">
+                                        $@fine.Amount.ToString("F2")
+                                    </strong>
+                                </td>
+                                <td>
+                                    <small class="text-muted">@fine.Reason</small>
+                                </td>
+                                <td>@fine.IssuedDate.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    @if (fine.IsPaid)
+                                    {
+                                        <span class="badge bg-success">
+                                            Paid on @fine.PaidDate?.ToString("MMM dd, yyyy")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+                                            Unpaid — Visit Library
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

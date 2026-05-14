@@ -1,0 +1,478 @@
+﻿@{
+    ViewData["Title"] = "Library Reports";
+}
+
+<div class="container-fluid mt-4 px-4">
+    <div class="page-header mb-4">
+        <h2 class="fw-bold mb-0">
+            <i class="bi bi-bar-chart me-2"></i> Library Reports
+        </h2>
+        <p class="mb-0 mt-1 opacity-75">
+            Overview of library activity and statistics
+        </p>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card stat-card-primary h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between
+                                align-items-center">
+                        <div>
+                            <p class="stat-label">Total Books</p>
+                            <h3 class="stat-number">
+                                @ViewBag.TotalBooks
+                            </h3>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="bi bi-book"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card stat-card-success h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between
+                                align-items-center">
+                        <div>
+                            <p class="stat-label">Total Members</p>
+                            <h3 class="stat-number">
+                                @ViewBag.TotalMembers
+                            </h3>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card stat-card-warning h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between
+                                align-items-center">
+                        <div>
+                            <p class="stat-label">Active Borrows</p>
+                            <h3 class="stat-number">
+                                @ViewBag.ActiveBorrows
+                            </h3>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="bi bi-arrow-left-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card stat-card-danger h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between
+                                align-items-center">
+                        <div>
+                            <p class="stat-label">Overdue Books</p>
+                            <h3 class="stat-number text-danger">
+                                @ViewBag.OverdueCount
+                            </h3>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+
+        <!-- Most Popular Books -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-trophy me-2"></i>
+                        Most Borrowed Books
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    @{
+                        var popularBooks = ViewBag.PopularBooks
+                        as IEnumerable<dynamic>
+                        ?? Enumerable.Empty<dynamic>();
+                    }
+                    @if (!popularBooks.Any())
+                    {
+                        <div class="text-center py-4">
+                            <p class="text-muted">No data yet</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th class="text-center">Borrows</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int rank = 1;
+                                }
+                                @foreach (var book in popularBooks)
+                                {
+                                    <tr>
+                                        <td>
+                                            @if (rank == 1)
+                                            {
+                                                <span class="badge bg-warning
+                                                                                     text-dark">
+                                                    #1
+                                                </span>
+                                            }
+                                            else if (rank == 2)
+                                            {
+                                                <span class="badge bg-secondary">
+                                                    #2
+                                                </span>
+                                            }
+                                            else if (rank == 3)
+                                            {
+                                                <span class="badge"
+                                                      style="background:#cd7f32">
+                                                    #3
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">
+                                                    #@rank
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <strong>@book.Title</strong>
+                                        </td>
+                                        <td class="text-muted">
+                                            @book.Author
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-primary">
+                                                @book.BorrowCount
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    rank++;
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Most Active Members -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-people me-2"></i>
+                        Most Active Members
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    @{
+                        var activeMembers = ViewBag.ActiveMembers
+                        as IEnumerable<dynamic>
+                        ?? Enumerable.Empty<dynamic>();
+                    }
+                    @if (!activeMembers.Any())
+                    {
+                        <div class="text-center py-4">
+                            <p class="text-muted">No data yet</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Member</th>
+                                    <th>Email</th>
+                                    <th class="text-center">Borrows</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int mrank = 1;
+                                }
+                                @foreach (var member in activeMembers)
+                                {
+                                    <tr>
+                                        <td class="text-muted">
+                                            #@mrank
+                                        </td>
+                                        <td>
+                                            <strong>
+                                                @member.FirstName
+                                                @member.LastName
+                                            </strong>
+                                        </td>
+                                        <td class="text-muted small">
+                                            @member.Email
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-success">
+                                                @member.BorrowCount
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    mrank++;
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fines Summary -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-cash me-2"></i>
+                        Fines Summary
+                    </h5>
+                </div>
+                <div class="card-body text-center py-4">
+                    <div class="mb-4">
+                        <h2 class="fw-bold text-danger">
+                            $@(((decimal)ViewBag.UnpaidFines)
+                                                        .ToString("F2"))
+                        </h2>
+                        <p class="text-muted mb-0">Total Unpaid Fines</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <h3 class="fw-bold text-success">
+                            $@(((decimal)ViewBag.TotalFines)
+                                                        .ToString("F2"))
+                        </h3>
+                        <p class="text-muted mb-0">
+                            Total Fines Issued
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Stats -->
+        <div class="col-lg-8">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-tags me-2"></i>
+                        Category Statistics
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    @{
+                        var catStats = ViewBag.CategoryStats
+                        as IEnumerable<dynamic>
+                        ?? Enumerable.Empty<dynamic>();
+                    }
+                    @if (!catStats.Any())
+                    {
+                        <div class="text-center py-4">
+                            <p class="text-muted">No categories yet</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th class="text-center">Books</th>
+                                    <th class="text-center">
+                                        Total Borrows
+                                    </th>
+                                    <th>Popularity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int maxBorrows = 1;
+                                    foreach (var c in catStats)
+                                    {
+                                        if (c.BorrowCount > maxBorrows)
+                                            maxBorrows = c.BorrowCount;
+                                    }
+                                }
+                                @foreach (var cat in catStats)
+                                {
+                                    int pct = maxBorrows > 0
+                                    ? (int)((cat.BorrowCount
+                                    / (double)maxBorrows) * 100)
+                                    : 0;
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary">
+                                                @cat.Name
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            @cat.BookCount
+                                        </td>
+                                        <td class="text-center">
+                                            @cat.BorrowCount
+                                        </td>
+                                        <td style="min-width:120px">
+                                            <div class="progress"
+                                                 style="height:8px">
+                                                <div class="progress-bar
+                                                                            bg-primary"
+                                                     style="width:@pct%">
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overdue Records -->
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Overdue Books
+                <span class="badge bg-white text-danger ms-2">
+                    @ViewBag.OverdueCount
+                </span>
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            @{
+                var overdueList = ViewBag.OverdueRecords
+                as IEnumerable<BorrowRecord>
+                ?? Enumerable.Empty<BorrowRecord>();
+            }
+            @if (!overdueList.Any())
+            {
+                <div class="text-center py-4">
+                    <i class="bi bi-check-circle text-success fs-1"></i>
+                    <p class="text-success mt-2 fw-bold">
+                        No overdue books!
+                    </p>
+                </div>
+            }
+            else
+            {
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Book</th>
+                            <th>Due Date</th>
+                            <th>Days Overdue</th>
+                            <th>Est. Fine</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var record in overdueList)
+                        {
+                            int daysOverdue = (int)(DateTime.Now
+                            - record.DueDate).TotalDays;
+                            <tr>
+                                <td>
+                                    <strong>
+                                        @record.User?.FullName
+                                    </strong>
+                                    <br />
+                                    <small class="text-muted">
+                                        @record.User?.Email
+                                    </small>
+                                </td>
+                                <td>@record.Book?.Title</td>
+                                <td class="text-danger fw-bold">
+                                    @record.DueDate.ToString("MMM dd, yyyy")
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger">
+                                        @daysOverdue days
+                                    </span>
+                                </td>
+                                <td class="text-danger fw-bold">
+                                    Est. $@(daysOverdue * 0.50m)
+                                    .ToString("F2")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    <!-- Borrowing Trend -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-graph-up me-2"></i>
+                Borrowing Trend — Last 7 Days
+            </h5>
+        </div>
+        <div class="card-body">
+            @{
+                var trend = ViewBag.BorrowTrend
+                as IEnumerable<dynamic>
+                ?? Enumerable.Empty<dynamic>();
+            }
+            <div class="d-flex gap-3 align-items-end"
+                 style="height:120px">
+                @foreach (var day in trend)
+                {
+                    int count = (int)day.Count;
+                    int barHeight = count > 0
+                    ? Math.Min(count * 20, 100) : 5;
+                    <div class="text-center flex-grow-1">
+                        <div class="d-flex flex-column
+                                            align-items-center
+                                            justify-content-end"
+                             style="height:100px">
+                            <span class="small fw-bold
+                                                 text-primary mb-1">
+                                @count
+                            </span>
+                            <div class="bg-primary rounded-top"
+                                 style="width:100%;
+                                                height:@barHeight px;
+                                                min-height:4px;
+                                                transition:height 0.3s">
+                            </div>
+                        </div>
+                        <small class="text-muted">@day.Date</small>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,202 @@
+﻿@model LibraryManagementSystem.Models.Feedback
+@{
+    ViewData["Title"] = "Write a Review";
+    var book = ViewBag.Book as LibraryManagementSystem.Models.Book;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+
+            @if (book != null)
+            {
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex gap-3 align-items-center">
+                            @if (!string.IsNullOrEmpty(book.CoverImagePath))
+                            {
+                                <img src="@book.CoverImagePath"
+                                     style="width:55px; height:75px;
+                                                            object-fit:cover;
+                                                            border-radius:6px;"
+                                     alt="@book.Title" />
+                            }
+                            else
+                            {
+                                <div style="width:55px; height:75px;
+                                                            background:#e8edf2;
+                                                            border-radius:6px;
+                                                            display:flex;
+                                                            align-items:center;
+                                                            justify-content:center;
+                                                            font-size:1.4rem;
+                                                            color:#8fa3b1;">
+                                    <i class="bi bi-book"></i>
+                                </div>
+                            }
+                            <div>
+                                <h5 class="fw-bold mb-1">@book.Title</h5>
+                                <p class="text-muted mb-0 small">
+                                    by @book.Author
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger mb-3">
+                    <i class="bi bi-exclamation-circle me-2"></i>
+                    @ViewBag.Error
+                </div>
+            }
+
+            <div class="card">
+                <div class="card-header text-white"
+                     style="background: linear-gradient(135deg,
+                            #1e3a5f, #2d5986);">
+                    <h5 class="mb-0">
+                        <i class="bi bi-star me-2"></i>
+                        Write Your Review
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post"
+                          asp-action="Create"
+                          asp-controller="Feedback">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="bookId"
+                               value="@Model.BookId" />
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">
+                                Your Rating
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="d-flex gap-2 mb-1">
+                                <input type="hidden"
+                                       name="rating"
+                                       id="ratingValue"
+                                       value="0" />
+                                <span class="star-btn fs-2 text-warning"
+                                      data-value="1"
+                                      style="cursor:pointer">
+                                    <i class="bi bi-star"></i>
+                                </span>
+                                <span class="star-btn fs-2 text-warning"
+                                      data-value="2"
+                                      style="cursor:pointer">
+                                    <i class="bi bi-star"></i>
+                                </span>
+                                <span class="star-btn fs-2 text-warning"
+                                      data-value="3"
+                                      style="cursor:pointer">
+                                    <i class="bi bi-star"></i>
+                                </span>
+                                <span class="star-btn fs-2 text-warning"
+                                      data-value="4"
+                                      style="cursor:pointer">
+                                    <i class="bi bi-star"></i>
+                                </span>
+                                <span class="star-btn fs-2 text-warning"
+                                      data-value="5"
+                                      style="cursor:pointer">
+                                    <i class="bi bi-star"></i>
+                                </span>
+                            </div>
+                            <div id="ratingLabel" class="text-muted small">
+                                Click a star to rate
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="comment"
+                                   class="form-label fw-semibold">
+                                Your Review
+                            </label>
+                            <textarea name="comment"
+                                      id="comment"
+                                      class="form-control"
+                                      rows="5"
+                                      placeholder="Share your thoughts about this book..."></textarea>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit"
+                                    class="btn btn-primary px-4">
+                                <i class="bi bi-send me-1"></i>
+                                Submit Review
+                            </button>
+                            <a asp-controller="Books"
+                               asp-action="Details"
+                               asp-route-id="@Model.BookId"
+                               class="btn btn-outline-secondary px-4">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        window.addEventListener('DOMContentLoaded', function () {
+            var stars = document.querySelectorAll('.star-btn');
+            var ratingInput = document.getElementById('ratingValue');
+            var ratingLabel = document.getElementById('ratingLabel');
+            var labels = {
+                1: 'Poor',
+                2: 'Fair',
+                3: 'Good',
+                4: 'Very Good',
+                5: 'Excellent!'
+            };
+
+            function fillStars(val) {
+                stars.forEach(function (s) {
+                    var sVal = parseInt(s.getAttribute('data-value'));
+                    var icon = s.querySelector('i');
+                    icon.className = sVal <= val
+                        ? 'bi bi-star-fill'
+                        : 'bi bi-star';
+                });
+            }
+
+            stars.forEach(function (star) {
+                star.addEventListener('click', function () {
+                    var val = parseInt(this.getAttribute('data-value'));
+                    ratingInput.value = val;
+                    ratingLabel.textContent = val + ' star - ' + labels[val];
+                    ratingLabel.className = 'small fw-semibold text-warning mt-1';
+                    fillStars(val);
+                });
+                star.addEventListener('mouseenter', function () {
+                    fillStars(parseInt(this.getAttribute('data-value')));
+                });
+                star.addEventListener('mouseleave', function () {
+                    fillStars(parseInt(ratingInput.value) || 0);
+                });
+            });
+
+            var form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    var val = parseInt(ratingInput.value);
+                    if (!val || val < 1) {
+                        e.preventDefault();
+                        ratingLabel.textContent = 'Please select a star rating first!';
+                        ratingLabel.className = 'small fw-semibold text-danger mt-1';
+                    }
+                });
+            }
+        });
+    </script>
+}
