@@ -1,0 +1,119 @@
+﻿@model LibraryManagementSystem.Models.BorrowingRule
+@{
+    ViewData["Title"] = "Edit Borrowing Rule";
+}
+
+<div class="container mt-4">
+    <div class="page-header mb-4">
+        <h2 class="fw-bold mb-0">
+            <i class="bi bi-pencil-square me-2"></i> Edit Borrowing Rule
+        </h2>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-body p-4">
+                    <form asp-action="Edit"
+                          asp-route-id="@Model.Id"
+                          method="post">
+                        <div asp-validation-summary="All"
+                             class="alert alert-danger"></div>
+
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="mb-3">
+                            <label asp-for="RuleName"
+                                   class="form-label fw-semibold"></label>
+                            <input asp-for="RuleName"
+                                   class="form-control" />
+                            <span asp-validation-for="RuleName"
+                                  class="text-danger small"></span>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="LoanDurationDays"
+                                       class="form-label fw-semibold"></label>
+                                <input asp-for="LoanDurationDays"
+                                       class="form-control"
+                                       type="number" min="1" />
+                                <span asp-validation-for="LoanDurationDays"
+                                      class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="MaxRenewals"
+                                       class="form-label fw-semibold"></label>
+                                <input asp-for="MaxRenewals"
+                                       class="form-control"
+                                       type="number" min="0" />
+                                <span asp-validation-for="MaxRenewals"
+                                      class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="OverduePenaltyPerDay"
+                                       class="form-label fw-semibold"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input asp-for="OverduePenaltyPerDay"
+                                           class="form-control"
+                                           type="number"
+                                           step="0.01" min="0" />
+                                </div>
+                                <span asp-validation-for="OverduePenaltyPerDay"
+                                      class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="MaxBorrowableItems"
+                                       class="form-label fw-semibold"></label>
+                                <input asp-for="MaxBorrowableItems"
+                                       class="form-control"
+                                       type="number" min="1" />
+                                <span asp-validation-for="MaxBorrowableItems"
+                                      class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes"
+                                   class="form-label fw-semibold"></label>
+                            <textarea asp-for="Notes"
+                                      class="form-control"
+                                      rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input asp-for="IsActive"
+                                       class="form-check-input" />
+                                <label asp-for="IsActive"
+                                       class="form-check-label fw-semibold">
+                                    Active Rule
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit"
+                                    class="btn btn-primary px-4">
+                                <i class="bi bi-check-lg me-1"></i>
+                                Update Rule
+                            </button>
+                            <a asp-action="Index"
+                               class="btn btn-outline-secondary px-4">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

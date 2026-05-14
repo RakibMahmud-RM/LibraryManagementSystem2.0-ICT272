@@ -16,17 +16,21 @@ namespace LibraryManagementSystem.Models
 
         [Required]
         public string UserId { get; set; } = string.Empty;
-        public ApplicationUser User { get; set; } = null!;
 
         [Required]
         public int BookId { get; set; }
+
+        [Display(Name = "Reserved On")]
+        public DateTime ReservationDate { get; set; } = DateTime.Now;
+
+        [Display(Name = "Expires On")]
+        public DateTime ExpiryDate { get; set; } = DateTime.Now.AddDays(7);
+
+        [Display(Name = "Status")]
+        public ReservationStatus Status { get; set; } = ReservationStatus.Pending;
+
+        // Navigation properties
+        public ApplicationUser User { get; set; } = null!;
         public Book Book { get; set; } = null!;
-
-        [Display(Name = "Reservation Date")]
-        public DateTime ReservationDate { get; set; }
-            = DateTime.Now;
-
-        public ReservationStatus Status { get; set; }
-            = ReservationStatus.Pending;
     }
 }

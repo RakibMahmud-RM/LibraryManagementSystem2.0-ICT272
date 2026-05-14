@@ -1,0 +1,220 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container-fluid mt-4 px-4">
+    <div class="d-flex justify-content-between
+                align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">
+                <i class="bi bi-speedometer2 me-2 text-primary"></i>
+                Admin Dashboard
+            </h2>
+            <p class="text-muted">
+                Welcome back, @User.Identity!.Name
+            </p>
+        </div>
+        <a asp-controller="Reports" asp-action="Index"
+           class="btn btn-outline-primary">
+            <i class="bi bi-bar-chart me-1"></i>
+            Full Reports
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card stat-card-primary h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between
+                                align-items-center">
+                        <div>
+                            <p class="stat-label">Total Books</p>
+                            <h3 class="stat-number">
+                                <a asp-controller="Books"
+                                   asp-action="Index"
+                                   class="text-decoration-none
+                                          text-dark">
+                                    @ViewBag.TotalBooks
+                                </a>
+                            </h3>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="bi bi-book"></i>
+                        </div>
+                    </div>
+                    <a asp-controller="Books"
+                       asp-action="Index"
+                       class="btn btn-sm btn-outline-primary mt-2">
+                        <i class="bi bi-arrow-right me-1"></i>
+                        View Books
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card stat-card-success h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between
+                                align-items-center">
+                        <div>
+                            <p class="stat-label">Total Members</p>
+                            <h3 class="stat-number">
+                                <a asp-controller="Admin"
+                                   asp-action="Members"
+                                   class="text-decoration-none
+                                          text-dark">
+                                    @ViewBag.TotalMembers
+                                </a>
+                            </h3>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                    </div>
+                    <a asp-controller="Admin"
+                       asp-action="Members"
+                       class="btn btn-sm btn-outline-success mt-2">
+                        <i class="bi bi-arrow-right me-1"></i>
+                        View Members
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card stat-card-warning h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between
+                                align-items-center">
+                        <div>
+                            <p class="stat-label">Active Borrows</p>
+                            <h3 class="stat-number">
+                                <a asp-controller="Borrow"
+                                   asp-action="Index"
+                                   class="text-decoration-none
+                                          text-dark">
+                                    @ViewBag.ActiveBorrows
+                                </a>
+                            </h3>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="bi bi-arrow-left-right"></i>
+                        </div>
+                    </div>
+                    <a asp-controller="Borrow"
+                       asp-action="Index"
+                       class="btn btn-sm btn-outline-warning mt-2">
+                        <i class="bi bi-arrow-right me-1"></i>
+                        View Borrows
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card stat-card-danger h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between
+                                align-items-center">
+                        <div>
+                            <p class="stat-label">Overdue</p>
+                            <h3 class="stat-number text-danger">
+                                <a asp-controller="Borrow"
+                                   asp-route-status="Overdue"
+                                   asp-action="Index"
+                                   class="text-decoration-none
+                                          text-danger">
+                                    @ViewBag.OverdueCount
+                                </a>
+                            </h3>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                    <a asp-controller="Borrow"
+                       asp-action="Index"
+                       asp-route-status="Overdue"
+                       class="btn btn-sm btn-outline-danger mt-2">
+                        <i class="bi bi-arrow-right me-1"></i>
+                        View Overdue
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-book-half text-primary"
+                       style="font-size:2.5rem"></i>
+                    <h5 class="fw-bold mt-3">Books</h5>
+                    <p class="text-muted small">
+                        Add, edit and delete books
+                    </p>
+                    <a asp-controller="Books"
+                       asp-action="Index"
+                       class="btn btn-primary btn-sm">
+                        Manage Books
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-people text-success"
+                       style="font-size:2.5rem"></i>
+                    <h5 class="fw-bold mt-3">Members</h5>
+                    <p class="text-muted small">
+                        View and manage library members
+                    </p>
+                    <a asp-controller="Admin"
+                       asp-action="Members"
+                       class="btn btn-success btn-sm">
+                        View Members
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-arrow-left-right text-warning"
+                       style="font-size:2.5rem"></i>
+                    <h5 class="fw-bold mt-3">Borrows</h5>
+                    <p class="text-muted small">
+                        Track and manage borrow records
+                    </p>
+                    <a asp-controller="Borrow"
+                       asp-action="Index"
+                       class="btn btn-warning btn-sm">
+                        View Transactions
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-star text-info"
+                       style="font-size:2.5rem"></i>
+                    <h5 class="fw-bold mt-3">Feedback</h5>
+                    <p class="text-muted small">
+                        Review pending member feedback
+                    </p>
+                    <a asp-controller="Feedback"
+                       asp-action="Manage"
+                       class="btn btn-info btn-sm text-white">
+                        Manage Feedback
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
