@@ -8,13 +8,13 @@
     <div class="row justify-content-center">
         <div class="col-lg-7">
 
-            <!-- Book Info Card -->
             @if (book != null)
             {
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="d-flex gap-3 align-items-center">
-                            @if (!string.IsNullOrEmpty(book.CoverImagePath))
+                            @if (!string.IsNullOrEmpty(
+                                                    book.CoverImagePath))
                             {
                                 <img src="@book.CoverImagePath"
                                      style="width:60px; height:80px;
@@ -36,15 +36,18 @@
                                 </div>
                             }
                             <div>
-                                <h5 class="fw-bold mb-1">@book.Title</h5>
-                                <p class="text-muted mb-0">by @book.Author</p>
+                                <h5 class="fw-bold mb-1">
+                                    @book.Title
+                                </h5>
+                                <p class="text-muted mb-0">
+                                    by @book.Author
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
             }
 
-            <!-- Review Form -->
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">
@@ -53,53 +56,78 @@
                     </h5>
                 </div>
                 <div class="card-body p-4">
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">
+                            @ViewBag.Error
+                        </div>
+                    }
+
                     <form asp-action="Create" method="post">
-                        <div asp-validation-summary="All"
-                             class="alert alert-danger"></div>
+                        @Html.AntiForgeryToken()
 
-                        <input type="hidden" asp-for="BookId" />
+                        <input type="hidden"
+                               name="bookId"
+                               value="@Model.BookId" />
 
-                        <!-- Star Rating -->
                         <div class="mb-4">
                             <label class="form-label fw-semibold">
                                 Your Rating
                                 <span class="text-danger">*</span>
                             </label>
-                            <div class="star-rating d-flex gap-2">
-                                @for (int i = 1; i <= 5; i++)
-                                {
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input
-                                                          visually-hidden"
-                                               type="radio"
-                                               asp-for="Rating"
-                                               value="@i"
-                                               id="star@i" />
-                                        <label class="form-check-label
-                                                          star-label fs-3"
-                                               for="star@i"
-                                               title="@i star">
-                                            <i class="bi bi-star
-                                                           text-warning"></i>
-                                        </label>
-                                    </div>
-                                }
+                            <div class="d-flex gap-3 mb-1"
+                                 id="starContainer">
+                                <i class="bi bi-star star-icon"
+                                   data-val="1"
+                                   style="font-size:2.2rem;
+                                          cursor:pointer;
+                                          color:#dee2e6;">
+                                </i>
+                                <i class="bi bi-star star-icon"
+                                   data-val="2"
+                                   style="font-size:2.2rem;
+                                          cursor:pointer;
+                                          color:#dee2e6;">
+                                </i>
+                                <i class="bi bi-star star-icon"
+                                   data-val="3"
+                                   style="font-size:2.2rem;
+                                          cursor:pointer;
+                                          color:#dee2e6;">
+                                </i>
+                                <i class="bi bi-star star-icon"
+                                   data-val="4"
+                                   style="font-size:2.2rem;
+                                          cursor:pointer;
+                                          color:#dee2e6;">
+                                </i>
+                                <i class="bi bi-star star-icon"
+                                   data-val="5"
+                                   style="font-size:2.2rem;
+                                          cursor:pointer;
+                                          color:#dee2e6;">
+                                </i>
                             </div>
-                            <span asp-validation-for="Rating"
-                                  class="text-danger small"></span>
-                            <div id="ratingText"
-                                 class="text-muted small mt-1"></div>
+                            <small id="ratingLabel"
+                                   class="text-muted">
+                                Click a star to rate
+                            </small>
+                            <input type="hidden"
+                                   id="ratingValue"
+                                   name="rating"
+                                   value="0" />
                         </div>
 
-                        <!-- Comment -->
                         <div class="mb-4">
-                            <label asp-for="Comment"
-                                   class="form-label fw-semibold"></label>
-                            <textarea asp-for="Comment"
-                                      class="form-control" rows="5"
-                                      placeholder="Share your thoughts about this book..."></textarea>
-                            <span asp-validation-for="Comment"
-                                  class="text-danger small"></span>
+                            <label class="form-label fw-semibold">
+                                Your Review
+                            </label>
+                            <textarea name="comment"
+                                      class="form-control"
+                                      rows="5"
+                                      placeholder="Share your thoughts about this book...">
+                            </textarea>
                         </div>
 
                         <div class="d-flex gap-2">
@@ -124,27 +152,45 @@
 </div>
 
 @section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
     <script>
-        const ratings = {
-            1: "Poor", 2: "Fair", 3: "Good",
-            4: "Very Good", 5: "Excellent"
-        };
+        var labels = ['', 'Poor', 'Fair', 'Good',
+                      'Very Good', 'Excellent'];
+        var stars = document.querySelectorAll('.star-icon');
+        var ratingInput = document.getElementById('ratingValue');
+        var ratingLabel = document.getElementById('ratingLabel');
+        var currentRating = 0;
 
-        document.querySelectorAll('input[name="Rating"]')
-            .forEach(input => {
-                input.addEventListener('change', function () {
-                    const val = parseInt(this.value);
-                    // Update star icons
-                    document.querySelectorAll('.star-label i')
-                        .forEach((star, idx) => {
-                            star.className = idx < val
-                                ? 'bi bi-star-fill text-warning'
-                                : 'bi bi-star text-warning';
-                        });
-                    document.getElementById('ratingText')
-                        .textContent = ratings[val] || '';
-                });
+        function paintStars(upTo) {
+            stars.forEach(function(s) {
+                var val = parseInt(s.getAttribute('data-val'));
+                if (val <= upTo) {
+                    s.className = 'bi bi-star-fill star-icon';
+                    s.style.color = '#f59e0b';
+                } else {
+                    s.className = 'bi bi-star star-icon';
+                    s.style.color = '#dee2e6';
+                }
             });
+        }
+
+        stars.forEach(function(star) {
+            star.addEventListener('click', function() {
+                currentRating = parseInt(
+                    this.getAttribute('data-val'));
+                ratingInput.value = currentRating;
+                ratingLabel.textContent = labels[currentRating];
+                paintStars(currentRating);
+            });
+
+            star.addEventListener('mouseover', function() {
+                var val = parseInt(
+                    this.getAttribute('data-val'));
+                paintStars(val);
+            });
+
+            star.addEventListener('mouseout', function() {
+                paintStars(currentRating);
+            });
+        });
     </script>
 }
