@@ -9,30 +9,46 @@
             <i class="bi bi-arrow-left-right me-2"></i>
             Borrow Transactions
         </h2>
-        <p class="mb-0 mt-1 opacity-75">Manage all borrowing records</p>
+        <p class="mb-0 mt-1 opacity-75">
+            Manage all borrowing records
+        </p>
     </div>
 
     <div class="card mb-4">
         <div class="card-body py-3">
             <div class="d-flex gap-2 flex-wrap">
                 <a asp-action="Index"
-                   class="btn btn-sm @(ViewBag.StatusFilter == null ? "btn-primary" : "btn-outline-primary")">
+                   class="btn btn-sm @(ViewBag.StatusFilter == null
+                                          ? "btn-primary"
+                                          : "btn-outline-primary")">
                     All
                 </a>
-                <a asp-action="Index" asp-route-status="Borrowed"
-                   class="btn btn-sm @(ViewBag.StatusFilter == "Borrowed" ? "btn-primary" : "btn-outline-primary")">
+                <a asp-action="Index"
+                   asp-route-status="Borrowed"
+                   class="btn btn-sm @(ViewBag.StatusFilter == "Borrowed"
+                                          ? "btn-warning"
+                                          : "btn-outline-warning")">
                     Borrowed
                 </a>
-                <a asp-action="Index" asp-route-status="Returned"
-                   class="btn btn-sm @(ViewBag.StatusFilter == "Returned" ? "btn-primary" : "btn-outline-primary")">
+                <a asp-action="Index"
+                   asp-route-status="Returned"
+                   class="btn btn-sm @(ViewBag.StatusFilter == "Returned"
+                                          ? "btn-success"
+                                          : "btn-outline-success")">
                     Returned
                 </a>
-                <a asp-action="Index" asp-route-status="Overdue"
-                   class="btn btn-sm @(ViewBag.StatusFilter == "Overdue" ? "btn-danger" : "btn-outline-danger")">
+                <a asp-action="Index"
+                   asp-route-status="Overdue"
+                   class="btn btn-sm @(ViewBag.StatusFilter == "Overdue"
+                                          ? "btn-danger"
+                                          : "btn-outline-danger")">
                     Overdue
                 </a>
-                <a asp-action="Index" asp-route-status="Renewed"
-                   class="btn btn-sm @(ViewBag.StatusFilter == "Renewed" ? "btn-primary" : "btn-outline-primary")">
+                <a asp-action="Index"
+                   asp-route-status="Renewed"
+                   class="btn btn-sm @(ViewBag.StatusFilter == "Renewed"
+                                          ? "btn-info"
+                                          : "btn-outline-info")">
                     Renewed
                 </a>
             </div>
@@ -44,8 +60,11 @@
             @if (!Model.Any())
             {
                 <div class="text-center py-5">
-                    <i class="bi bi-inbox text-muted" style="font-size:3rem"></i>
-                    <h5 class="mt-3 text-muted">No borrow records found</h5>
+                    <i class="bi bi-inbox text-muted"
+                       style="font-size:3rem"></i>
+                    <h5 class="mt-3 text-muted">
+                        No borrow records found
+                    </h5>
                 </div>
             }
             else
@@ -69,36 +88,76 @@
                             {
                                 <tr>
                                     <td>
-                                        <strong>@record.User?.FullName</strong>
+                                        <strong>
+                                            @record.User?.FullName
+                                        </strong>
                                         <br />
-                                        <small class="text-muted">@record.User?.Email</small>
+                                        <small class="text-muted">
+                                            @record.User?.Email
+                                        </small>
                                     </td>
                                     <td>@record.Book?.Title</td>
-                                    <td>@record.BorrowDate.ToString("MMM dd, yyyy")</td>
                                     <td>
-                                        <span class="@(record.DueDate < DateTime.Now && record.Status != LibraryManagementSystem.Models.BorrowStatus.Returned ? "text-danger fw-bold" : "")">
-                                            @record.DueDate.ToString("MMM dd, yyyy")
-                                        </span>
+                                        @record.BorrowDate
+                                        .ToString("MMM dd, yyyy")
                                     </td>
                                     <td>
-                                        @(record.ReturnDate.HasValue
-                                                                        ? record.ReturnDate.Value.ToString("MMM dd, yyyy")
-                                                                        : "—")
+                                        <span class="@(
+                                              record.DueDate < DateTime.Now
+                                              && record.Status !=
+                                                  LibraryManagementSystem
+                                                      .Models.BorrowStatus
+                                                      .Returned
+                                              ? "text-danger fw-bold"
+                                              : "")">
+                                                 @record.DueDate
+                                                 .ToString("MMM dd, yyyy")
+                                             </span>
+                                         </td>
+                                         <td>
+                                @(record.ReturnDate.HasValue
+                                ? record.ReturnDate.Value
+                                .ToString("MMM dd, yyyy")
+                                : "—")
                             </td>
                             <td>
                                 @switch (record.Status)
                                         {
-                                            case LibraryManagementSystem.Models.BorrowStatus.Borrowed:
-                                                <span class="badge badge-borrowed px-2 py-1">Borrowed</span>
+                                            case LibraryManagementSystem
+                                                                .Models.BorrowStatus
+                                                                .Borrowed:
+                                                <span class="badge
+                                                                      badge-borrowed
+                                                                      px-2 py-1">
+                                                    Borrowed
+                                                </span>
                                                 break;
-                                            case LibraryManagementSystem.Models.BorrowStatus.Returned:
-                                                <span class="badge badge-returned px-2 py-1">Returned</span>
+                                            case LibraryManagementSystem
+                                                                .Models.BorrowStatus
+                                                                .Returned:
+                                                <span class="badge
+                                                                      badge-returned
+                                                                      px-2 py-1">
+                                                    Returned
+                                                </span>
                                                 break;
-                                            case LibraryManagementSystem.Models.BorrowStatus.Overdue:
-                                                <span class="badge badge-overdue px-2 py-1">Overdue</span>
+                                            case LibraryManagementSystem
+                                                                .Models.BorrowStatus
+                                                                .Overdue:
+                                                <span class="badge
+                                                                      badge-overdue
+                                                                      px-2 py-1">
+                                                    Overdue
+                                                </span>
                                                 break;
-                                            case LibraryManagementSystem.Models.BorrowStatus.Renewed:
-                                                <span class="badge badge-reserved px-2 py-1">Renewed</span>
+                                            case LibraryManagementSystem
+                                                                .Models.BorrowStatus
+                                                                .Renewed:
+                                                <span class="badge
+                                                                      badge-reserved
+                                                                      px-2 py-1">
+                                                    Renewed
+                                                </span>
                                                 break;
                                         }
                                     </td>
@@ -106,36 +165,50 @@
                                         @if (record.Fine != null)
                                         {
                                             <span class="text-danger fw-bold">
-                                                $@record.Fine.Amount.ToString("F2")
+                                                $@record.Fine.Amount
+                                                .ToString("F2")
                                             </span>
                                             if (record.Fine.IsPaid)
                                             {
                                                 <br />
-                                                <small class="text-success">Paid</small>
+                                                <small class="text-success">
+                                                    Paid
+                                                </small>
                                             }
                                         }
                                         else
                                         {
-                                            <span class="text-muted">—</span>
+                                            <span class="text-muted">
+                                                —
+                                            </span>
                                         }
                                     </td>
                                     <td class="text-center">
-                                        @if (record.Status != LibraryManagementSystem.Models.BorrowStatus.Returned)
+                                        @if (record.Status !=
+                                                                        LibraryManagementSystem
+                                                                        .Models.BorrowStatus
+                                                                        .Returned)
                                         {
                                             <form asp-action="Return"
-                                                  asp-route-id="@record.Id"
+                                                  asp-route-borrowId="@record.Id"
                                                   method="post"
                                                   class="d-inline"
-                                                  onsubmit="return confirm('Mark as returned?')">
+                                                  onsubmit="return confirm(
+                                                                  'Mark as returned?')">
                                                 @Html.AntiForgeryToken()
-                                                <button type="submit" class="btn btn-sm btn-success">
-                                                    <i class="bi bi-check-lg me-1"></i> Return
+                                                <button type="submit"
+                                                        class="btn btn-sm
+                                                                           btn-success">
+                                                    <i class="bi bi-check-lg me-1"></i>
+                                                    Return
                                                 </button>
                                             </form>
                                         }
                                         else
                                         {
-                                            <span class="text-muted small">Completed</span>
+                                            <span class="text-muted small">
+                                                Completed
+                                            </span>
                                         }
                                     </td>
                                 </tr>
