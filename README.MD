@@ -49,16 +49,7 @@ in a real-world scenario.
 
 ---
 
-## 👥 Development Team
 
-| Name | Student ID | Role |
-|------|-----------|------|
-| Rakib Mahmud | 20029869  Lead Developer 
-| Md Mehedi Hassan Talukder 20032100 
-| Md Salaman Prodhan  20030404 
-
-**Unit:** ICT272 — Web Design and Development
-**Trimester:** T1 2026
 
 ---
 
